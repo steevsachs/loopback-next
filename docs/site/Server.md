@@ -23,7 +23,7 @@ listening on different ports and working with different protocols.
 
 LoopBack 4 currently offers the
 [`@loopback/rest`](https://github.com/strongloop/loopback-next/tree/master/packages/rest)
-package out of the box which provides an HTTP based server implementation
+package out of the box which provides an HTTP/HTTPS based server implementation
 handling requests over REST called `RestServer`. In order to use it in your
 application, all you need to do is have your application class extend
 `RestApplication`, and it will provide you with an instance of RestServer
@@ -57,6 +57,52 @@ export class HelloWorldApp extends RestApplication {
 ```
 
 ## Configuration
+
+### Enable HTTPS
+
+Enabling HTTPS for the LoopBack REST server is just a matter of specifying the
+protocol as `https` and specifying the crendential files. You can either use a
+key-certificate or pfx-passphrase combo.
+
+In the following app we confiure HTTPS for a bare miminum app using a
+key-certificate combo.
+
+```ts
+import {RestApplication, RestServer, RestBindings} from '@loopback/rest';
+import * as fs from 'fs';
+
+export async function main() {
+  const options = {
+    rest: {
+      protocol: 'https',
+      key: fs.readFileSync('./key.pem'),
+      cert: fs.readFileSync('./cert.pem'),
+    },
+  };
+  const app = new RestApplication(options);
+  app.handler(handler => {
+    handler.response.send('Hello');
+  });
+  await app.start();
+  const server = await app.getServer(RestServer);
+  const port = await server.get(RestBindings.PORT);
+  const protocol = await server.get(RestBindings.PROTOCOL);
+  console.log(`Server is running at ${protocol}://127.0.0.1:${port}`);
+}
+```
+
+The same app can be HTTPS configured using a pfx-passphrase combo by setting the
+`options` to the following.
+
+```ts
+const options = {
+  rest: {
+    protocol: 'https',
+    key: fs.readFileSync('./key.pem'),
+    cert: fs.readFileSync('./cert.pem'),
+  },
+};
+```
 
 ### Add servers to application instance
 
