@@ -21,13 +21,15 @@ listening on different ports and working with different protocols.
 
 ## Usage
 
-LoopBack 4 currently offers the
+LoopBack 4 offers the
 [`@loopback/rest`](https://github.com/strongloop/loopback-next/tree/master/packages/rest)
-package out of the box which provides an HTTP/HTTPS based server implementation
-handling requests over REST called `RestServer`. In order to use it in your
-application, all you need to do is have your application class extend
-`RestApplication`, and it will provide you with an instance of RestServer
-listening on port 3000. The following shows how to make use of it:
+package which provides out of the box HTTP/HTTPS based server called
+`RestServer` for handling REST requests.
+
+In order to use it in your application, all you need to do is have your
+application class extend `RestApplication`, and it will provide you with an
+instance of RestServer listening on port 3000. The following shows how to make
+use of it:
 
 ```ts
 import {RestApplication, RestServer} from '@loopback/rest';
