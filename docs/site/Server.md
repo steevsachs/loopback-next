@@ -61,11 +61,10 @@ export class HelloWorldApp extends RestApplication {
 ### Enable HTTPS
 
 Enabling HTTPS for the LoopBack REST server is just a matter of specifying the
-protocol as `https` and specifying the crendential files. You can either use a
-key-certificate or pfx-passphrase combo.
+protocol as `https` and specifying the crendential details.
 
-In the following app we confiure HTTPS for a bare miminum app using a
-key-certificate combo.
+In the following app we configure HTTPS for a bare miminum app using a key +
+certificate chain variant.
 
 ```ts
 import {RestApplication, RestServer, RestBindings} from '@loopback/rest';
@@ -84,24 +83,10 @@ export async function main() {
     handler.response.send('Hello');
   });
   await app.start();
-  const server = await app.getServer(RestServer);
-  const port = await server.get(RestBindings.PORT);
-  const protocol = await server.get(RestBindings.PROTOCOL);
-  console.log(`Server is running at ${protocol}://127.0.0.1:${port}`);
+
+  const url = app.restServer.url;
+  console.log(`Server is running at ${url}`);
 }
-```
-
-The same app can be HTTPS configured using a pfx-passphrase combo by setting the
-`options` to the following.
-
-```ts
-const options = {
-  rest: {
-    protocol: 'https',
-    key: fs.readFileSync('./key.pem'),
-    cert: fs.readFileSync('./cert.pem'),
-  },
-};
 ```
 
 ### Add servers to application instance
