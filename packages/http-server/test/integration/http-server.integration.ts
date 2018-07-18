@@ -3,13 +3,17 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 import {HttpServer, HttpOptions, HttpServerOptions} from '../../';
-import {supertest, expect} from '@loopback/testlab';
+import {
+  supertest,
+  expect,
+  itSkippedOnTravis,
+  getAsync,
+  httpsGetAsync,
+} from '@loopback/testlab';
 import * as makeRequest from 'request-promise-native';
-import {ServerRequest, ServerResponse, get, IncomingMessage} from 'http';
-import * as https from 'https';
+import {ServerRequest, ServerResponse} from 'http';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as url from 'url';
 
 describe('HttpServer (integration)', () => {
   let server: HttpServer | undefined;
@@ -181,12 +185,6 @@ describe('HttpServer (integration)', () => {
     await server.stop();
   }
 
-  function getAsync(urlString: string): Promise<IncomingMessage> {
-    return new Promise((resolve, reject) => {
-      get(urlString, resolve).on('error', reject);
-    });
-  }
-
   function givenHttpsServer({
     usePfx,
     host,
@@ -208,40 +206,10 @@ describe('HttpServer (integration)', () => {
     return new HttpServer(dummyRequestHandler, options);
   }
 
-  function httpsGetAsync(urlString: string): Promise<IncomingMessage> {
-    const agent = new https.Agent({
-      rejectUnauthorized: false,
-    });
-
-    const urlOptions = url.parse(urlString);
-    const options = {agent, ...urlOptions};
-
-    return new Promise((resolve, reject) => {
-      https.get(options, resolve).on('error', reject);
-    });
-  }
-
   function givenServerOptions(
     options: Partial<HttpServerOptions> = {},
   ): HttpServerOptions {
     const defaults = process.env.TRAVIS ? {host: '127.0.0.1'} : {};
     return Object.assign(defaults, options);
-  }
-
-  // tslint:disable-next-line:no-any
-  type TestCallbackRetval = void | PromiseLike<any>;
-
-  function itSkippedOnTravis(
-    expectation: string,
-    callback?: (
-      this: Mocha.ITestCallbackContext,
-      done: MochaDone,
-    ) => TestCallbackRetval,
-  ): void {
-    if (process.env.TRAVIS) {
-      it.skip(`[SKIPPED ON TRAVIS] ${expectation}`, callback);
-    } else {
-      it(expectation, callback);
-    }
   }
 });
